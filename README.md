@@ -10,3 +10,7 @@ and then
 in order to get app tray apps in gnome use:
 
 `ln -s ~/.nix-profile/share/applications/* ~/.local/share/applications/`
+
+helpful links:
+home manager configs: `https://rycee.gitlab.io/home-manager/options.html`
+nix packages: `https://search.nixos.org/packages`
