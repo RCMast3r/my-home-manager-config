@@ -5,5 +5,6 @@ let
     cachix
     lorri
     spotify
+    nixpkgs-fmt
   ];
 in nixTools

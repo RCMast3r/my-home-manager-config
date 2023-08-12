@@ -6,6 +6,9 @@ and then
 
 `./result/activate`
 
+or just use:
+
+`./update.sh`
 
 in order to get app tray apps in gnome use:
 
