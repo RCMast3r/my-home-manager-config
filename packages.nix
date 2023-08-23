@@ -6,5 +6,8 @@ let
     lorri
     spotify
     nixpkgs-fmt
+    keepassxc
+    google-chrome
+    discord
   ];
 in nixTools
