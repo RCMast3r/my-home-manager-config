@@ -13,7 +13,7 @@ declare -A folder_pairs=(
 echo "${folder_pairs}"
 # Loop through folder pairs
 for source_folder in "${!folder_pairs[@]}"; do
-echo "asdf $source_folder"
+echo "$source_folder"
     target_folder="${folder_pairs[${source_folder}]}"
     
     # Check if source folder exists

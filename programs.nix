@@ -20,6 +20,36 @@
         version = "0.0.9";
         sha256 = "sha256-LNtXYZ65Lka1lpxeKozK6LB0yaxAjHsfVsCJ8ILX8io=";
       }
+      {
+        name = "cortex-debug";
+        publisher = "marus25";
+        version = "1.12.1";
+        sha256 = "sha256-ioK6gwtkaAcfxn11lqpwhrpILSfft/byeEqoEtJIfM0=";
+      }
+      {
+        name = "debug-tracker-vscode";
+        publisher = "mcu-debug";
+        version = "0.0.15";
+        sha256 = "sha256-2u4Moixrf94vDLBQzz57dToLbqzz7OenQL6G9BMCn3I=";
+      }
+      {
+        name = "memory-view";
+        publisher = "mcu-debug";
+        version = "0.0.24";
+        sha256 = "sha256-SOs+h0MlypaICmueQ2dkqNJYc/J0e14U+SAmGYuJYvk=";
+      }
+      {
+        name = "rtos-views";
+        publisher = "mcu-debug";
+        version = "0.0.7";
+        sha256 = "sha256-VvMAYU7KiFxwLopUrOjvhBmA3ZKz4Zu8mywXZXCEHdo=";
+      }
+      {
+        name = "peripheral-viewer";
+        publisher = "mcu-debug";
+        version = "1.4.6";
+        sha256 = "sha256-flWBK+ugrbgy5pEDmGQeUzk1s2sCMQJRgrS3Ku1Oiag=";
+      }
     ];
 
     userSettings = {
@@ -27,6 +57,7 @@
       "files.autoSave" = "afterDelay";
       "cmake.configureOnOpen" = false;
       "editor.minimap.enabled" = false;
+      "cortex-debug.stlinkPath.linux"= "nix/store/j9gj5jhp50qb9hdzg1y7rlx6nilflyfa-stlink-1.7.0/bin/st-util";
     };
     keybindings = [
       {

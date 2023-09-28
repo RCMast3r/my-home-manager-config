@@ -9,5 +9,7 @@ let
     keepassxc
     google-chrome
     discord
+    freetube
+    obsidian
   ];
 in nixTools
