@@ -11,5 +11,8 @@ let
     discord
     freetube
     obsidian
+    flatbuffers
+    protobuf
+    whatsapp-for-linux
   ];
 in nixTools

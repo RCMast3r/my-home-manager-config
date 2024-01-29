@@ -1,8 +1,19 @@
 { pkgs, ... }:
 {
-  nextcloud-client = {
+  ystemd = {
+      services = { 
+  yourScriptService = {
     enable = true;
-    startInBackground = true;
-    package = pkgs.nextcloud-client;
+    description = "chrome-fix";
+    script = [
+      pkgs.writeText
+      "fix-chrome.sh"
+      ''
+        #!/bin/sh
+        rm -rf ${config.home.homeDirectory}/.config/google-chrome/Singleton*
+      ''
+    ];
+    wantedBy = [ "default.target" ];
   };
+      }'
 }
