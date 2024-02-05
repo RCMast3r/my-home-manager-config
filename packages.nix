@@ -14,5 +14,6 @@ let
     flatbuffers
     protobuf
     whatsapp-for-linux
+    slack
   ];
 in nixTools

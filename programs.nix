@@ -56,8 +56,10 @@
       "files.userSettings" = "on";
       "files.autoSave" = "afterDelay";
       "cmake.configureOnOpen" = false;
+      "platformio-ide.autoRebuildAutocompleteIndex" = false;
       "editor.minimap.enabled" = false;
       "cortex-debug.stlinkPath.linux" = "nix/store/j9gj5jhp50qb9hdzg1y7rlx6nilflyfa-stlink-1.7.0/bin/st-util";
+      "window.zoomLevel" = 1;
     };
     keybindings = [
       {
