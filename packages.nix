@@ -15,5 +15,6 @@ let
     protobuf
     whatsapp-for-linux
     slack
+    marp-cli
   ];
 in nixTools

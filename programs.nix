@@ -7,7 +7,7 @@
     mutableExtensionsDir = false;
     enable = true;
     # will at some point include these: https://github.com/RCMast3r/vscode_extensions/blob/master/combined_ext_list.sh
-    extensions = [ pkgs.vscode-extensions.ms-python.python pkgs.vscode-extensions.ms-vscode-remote.remote-ssh pkgs.vscode-extensions.twxs.cmake pkgs.vscode-extensions.ms-vscode.cmake-tools pkgs.vscode-extensions.shd101wyy.markdown-preview-enhanced pkgs.vscode-extensions.ms-vscode.cpptools pkgs.vscode-extensions.jnoortheen.nix-ide pkgs.vscode-extensions.vscodevim.vim ] ++ pkgs.vscode-utils.extensionsFromVscodeMarketplace [
+    extensions = [ pkgs.vscode-extensions.marp-team.marp-vscode pkgs.vscode-extensions.ms-python.python pkgs.vscode-extensions.ms-vscode-remote.remote-ssh pkgs.vscode-extensions.twxs.cmake pkgs.vscode-extensions.ms-vscode.cmake-tools pkgs.vscode-extensions.shd101wyy.markdown-preview-enhanced pkgs.vscode-extensions.ms-vscode.cpptools pkgs.vscode-extensions.jnoortheen.nix-ide pkgs.vscode-extensions.vscodevim.vim ] ++ pkgs.vscode-utils.extensionsFromVscodeMarketplace [
       {
         name = "platformio-ide";
         publisher = "platformio";
