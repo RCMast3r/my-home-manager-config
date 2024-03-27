@@ -13,8 +13,12 @@ let
     obsidian
     flatbuffers
     protobuf
-    whatsapp-for-linux
+    # whatsapp-for-linux
     slack
     marp-cli
+    htop
+    # jupyter
+    # python311Packages.black
+    # python311Packages.pip
   ];
 in nixTools

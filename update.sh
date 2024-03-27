@@ -38,7 +38,9 @@ echo "$source_folder"
             ln -s "$file" "$target_folder/$filename"
             echo "Created symlink for '$filename' in '$target_folder'."
         else
-            echo "Symlink for '$filename' already exists in '$target_folder'."
+            echo "Symlink for '$filename' already exists in '$target_folder'. deleting and remaking."
+            rm "$target_folder/$filename"
+            ln -s "$file" "$target_folder/$filename"
         fi
     done
     
