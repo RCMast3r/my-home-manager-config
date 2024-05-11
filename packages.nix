@@ -17,6 +17,7 @@ let
     slack
     marp-cli
     htop
+    element-desktop
     # jupyter
     # python311Packages.black
     # python311Packages.pip
