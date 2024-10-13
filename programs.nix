@@ -19,6 +19,12 @@
       pkgs.vscode-extensions.ms-vscode.cpptools
       pkgs.vscode-extensions.jnoortheen.nix-ide
       pkgs.vscode-extensions.vscodevim.vim
+      pkgs.vscode-extensions.njpwerner.autodocstring
+      pkgs.vscode-extensions.mkhl.direnv
+      pkgs.vscode-extensions.mhutchie.git-graph
+      pkgs.vscode-extensions.ms-dotnettools.vscode-dotnet-runtime
+      pkgs.vscode-extensions.ms-vscode.cmake-tools
+      pkgs.vscode-extensions.llvm-vs-code-extensions.vscode-clangd
     ] ++ pkgs.vscode-utils.extensionsFromVscodeMarketplace [
       {
         name = "cpp-helper";
@@ -31,12 +37,6 @@
         publisher = "platformio";
         version = "3.3.1";
         sha256 = "sha256-zBZFpOWJ4JEv6qu9XT1u0uspZ+N2wKrpL3joC+/t/zs=";
-      }
-      {
-        name = "cmake-language-support-vscode";
-        publisher = "josetr";
-        version = "0.0.9";
-        sha256 = "sha256-LNtXYZ65Lka1lpxeKozK6LB0yaxAjHsfVsCJ8ILX8io=";
       }
       {
         name = "cortex-debug";
@@ -81,6 +81,9 @@
       "[python]" = {
         "editor.defaultFormatter" = "ms-python.black-formatter";
       };
+      "[cpp]" = {
+        "editor.defaultFormatter" = "llvm-vs-code-extensions.vscode-clangd";
+      };
     };
     keybindings = [
       {
@@ -124,6 +127,48 @@
       }
     ];
   };
+  direnv = {
+    enable = true;
+    enableBashIntegration = true; # see note on other shells below
+    nix-direnv.enable = true;
+  };
+
+  # bash.enable = true; # see note on other shells below
+  neovim = {
+    enable = true;
+    viAlias = true;
+    vimAlias = true;
+
+    plugins = with pkgs.vimPlugins; [
+      LazyVim
+      vim-cmake
+      coc-nvim # For autocompletion
+      vim-lsp
+    ];
+
+    extraConfig = ''
+      lua << EOF
+        -- LazyVim setup
+        require('lazy').setup({
+          {
+            'neovim/nvim-lspconfig',  -- C++ LSP
+            config = function()
+              require'lspconfig'.clangd.setup{}
+            end
+          },
+          'vim-scripts/vim-cmake',  -- CMake support
+        })
+      EOF
+    ''; 
+    # lua = pkgs.lua;
+  };
+  # coc = {
+  #   enable = true;
+  #   extensions = [
+  #     "coc-clangd" # C++ LSP support
+  #   ];
+  # };
+
   git = {
     enable = true;
     userEmail = "rcmast3r1@gmail.com";
