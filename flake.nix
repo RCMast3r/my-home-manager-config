@@ -7,9 +7,14 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    nixvim = {
+      url = "github:nix-community/nixvim/nixos-24.11";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.home-manager.follows = "home-manager";
+    };
   };
 
-  outputs = { self, nixpkgs, home-manager }:
+  outputs = { self, nixpkgs, home-manager, nixvim, ... }:
     let
       # Values you should modify
       username = "ben"; # $USER
@@ -31,10 +36,14 @@
       });
     in {
       homeConfigurations.${username} = home-manager.lib.homeManagerConfiguration {
+        # lib = nixpkgs.lib;
         inherit pkgs;
-
+        extraSpecialArgs = {
+          inherit self;
+        };
         modules = [
           home
+          nixvim.homeManagerModules.nixvim
         ];
       };
     };

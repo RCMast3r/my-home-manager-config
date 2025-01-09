@@ -18,6 +18,8 @@ let
     marp-cli
     htop
     element-desktop
+    qucs-s
+    teams-for-linux
     # jupyter
     # python311Packages.black
     # python311Packages.pip
