@@ -5,7 +5,7 @@ let
     cachix
     lorri
     spotify
-    nixpkgs-fmt
+    nixfmt-classic
     keepassxc
     google-chrome
     discord
