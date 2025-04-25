@@ -9,19 +9,15 @@ let
     keepassxc
     google-chrome
     discord
-    freetube
     obsidian
     flatbuffers
     protobuf
-    # whatsapp-for-linux
     slack
     marp-cli
     htop
     element-desktop
     qucs-s
     teams-for-linux
-    # jupyter
-    # python311Packages.black
-    # python311Packages.pip
+    vscode
   ];
 in nixTools

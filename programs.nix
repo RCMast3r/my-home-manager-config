@@ -1,14 +1,13 @@
 { pkgs, ... }:
 let
 in
-# inherit (lib.nixvim) mkRaw;
 {
   home-manager = {
     enable = true;
   };
   vscode = {
-    mutableExtensionsDir = false;
     enable = true;
+
     # will at some point include these: https://github.com/RCMast3r/vscode_extensions/blob/master/combined_ext_list.sh
     extensions =
       [
@@ -21,7 +20,6 @@ in
         pkgs.vscode-extensions.twxs.cmake
         pkgs.vscode-extensions.ms-vscode.cmake-tools
         pkgs.vscode-extensions.shd101wyy.markdown-preview-enhanced
-        # pkgs.vscode-extensions.ms-vscode.cpptools
         pkgs.vscode-extensions.llvm-vs-code-extensions.vscode-clangd
         pkgs.vscode-extensions.xaver.clang-format
         pkgs.vscode-extensions.jnoortheen.nix-ide
@@ -48,34 +46,10 @@ in
           sha256 = "sha256-LNtXYZ65Lka1lpxeKozK6LB0yaxAjHsfVsCJ8ILX8io=";
         }
         {
-          name = "cortex-debug";
-          publisher = "marus25";
-          version = "1.12.1";
-          sha256 = "sha256-ioK6gwtkaAcfxn11lqpwhrpILSfft/byeEqoEtJIfM0=";
-        }
-        {
-          name = "debug-tracker-vscode";
-          publisher = "mcu-debug";
-          version = "0.0.15";
-          sha256 = "sha256-2u4Moixrf94vDLBQzz57dToLbqzz7OenQL6G9BMCn3I=";
-        }
-        {
-          name = "memory-view";
-          publisher = "mcu-debug";
-          version = "0.0.24";
-          sha256 = "sha256-SOs+h0MlypaICmueQ2dkqNJYc/J0e14U+SAmGYuJYvk=";
-        }
-        {
-          name = "rtos-views";
-          publisher = "mcu-debug";
-          version = "0.0.7";
-          sha256 = "sha256-VvMAYU7KiFxwLopUrOjvhBmA3ZKz4Zu8mywXZXCEHdo=";
-        }
-        {
-          name = "peripheral-viewer";
-          publisher = "mcu-debug";
-          version = "1.4.6";
-          sha256 = "sha256-flWBK+ugrbgy5pEDmGQeUzk1s2sCMQJRgrS3Ku1Oiag=";
+          name = "doc-doxygen";
+          publisher = "dusartvict";
+          version = "0.3.16";
+          sha256 = "sha256-33zA0ya0MFfNnusR8Ro75weOwTLv1ksXOtiGp9hArzI=";
         }
       ];
 
@@ -85,8 +59,6 @@ in
       "cmake.configureOnOpen" = false;
       "platformio-ide.autoRebuildAutocompleteIndex" = false;
       "editor.minimap.enabled" = false;
-      "cortex-debug.stlinkPath.linux" =
-        "nix/store/j9gj5jhp50qb9hdzg1y7rlx6nilflyfa-stlink-1.7.0/bin/st-util";
       "window.zoomLevel" = 1;
       "[python]" = {
         "editor.defaultFormatter" = "ms-python.black-formatter";
@@ -137,7 +109,7 @@ in
   };
 
   nixvim = {
-    enable = true;
+    enable = false;
     extraConfigLuaPre = ''
       -- Global undo files
       vim.cmd("set undodir=~/.nvim/undodir")
@@ -169,55 +141,6 @@ in
     extraPlugins = [ pkgs.vimPlugins.nightfox-nvim ];
 
     keymaps = [
-      # {
-      #   key = "<leader>fF";
-      #   action = mkRaw "function() require('telescope').find_files({ hidden = true, no_ignore = true }) end";
-      #   options = {
-      #     desc = "Find all files";
-      #     silent = true;
-      #   };
-      # }
-      # {
-      #   key = "<C-b>";
-      #   action = mkRaw "function() require('cmp').mapping.scroll_docs(-4) end";
-      #   options = {
-      #     desc = "Scroll back in completion results";
-      #     silent = true;
-      #   };
-      # }
-      # {
-      #   key = "<C-f>";
-      #   action = mkRaw "function() require('cmp').mapping.scroll_docs(4) end";
-      #   options = {
-      #     desc = "Scroll forward in completion results";
-      #     silent = true;
-      #   };
-      # }
-      # {
-      #   key = "<C-Space>";
-      #   action = mkRaw "function() require('cmp').mapping.complete() end";
-      #   options = {
-      #     desc = "Complete with current selection";
-      #     silent = true;
-      #   };
-      # }
-      # {
-      #   key = "<C-e>";
-      #   action = mkRaw "function() require('cmp').mapping.abort() end";
-      #   options = {
-      #     desc = "Abort completion";
-      #     silent = true;
-      #   };
-      # }
-      # {
-      #   key = "<CR>";
-      #   action = mkRaw "function() require('cmp').mapping.confirm({ select = true }) end";
-      #   options = {
-      #     desc = "Select the current results";
-      #     silent = true;
-      #   };
-      # }
-      # Neo-tree key maps
       {
         key = "<leader>o";
         action = "<cmd>lua if vim.bo.filetype == 'neo-tree' then vim.cmd.wincmd 'p' else vim.cmd.Neotree 'focus' end <cr>";
@@ -238,12 +161,12 @@ in
       # which-key.enable = true;
       luasnip.enable = true;
 
-      codeium-nvim = {
-        enable = true;
-        settings = {
-          enable_chat = true;
-        };
-      };
+      # windsurf-nvim = {
+      #   enable = true;
+      #   settings = {
+      #     enable_chat = true;
+      #   };
+      # };
 
       cmp = {
         enable = true;
@@ -282,7 +205,7 @@ in
             { name = "nvim_lsp_document_symbol"; }
             { name = "nvim_lsp_signature_help"; }
             { name = "buffer"; }
-            { name = "codeium"; }
+            # { name = "codeium"; }
           ];
         };
 
@@ -700,6 +623,17 @@ in
 
   };
 
+  zed-editor = {
+    enable = true;
+    
+    extensions = ["nix" "toml" "elixir" "make" "neocmake" "proto"];
+
+  };
+
+  zsh = {
+	enable = true;
+  oh-my-zsh.enable = true;
+	};
   git = {
     enable = true;
     userEmail = "rcmast3r1@gmail.com";

@@ -2,9 +2,9 @@
   description = "Home Manager configuration";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs";
+    nixpkgs.url = "github:NixOS/nixpkgs/release-24.11";
     home-manager = {
-      url = "github:nix-community/home-manager";
+      url = "github:nix-community/home-manager/release-24.11";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nixvim = {
@@ -19,7 +19,7 @@
       # Values you should modify
       username = "ben"; # $USER
       system = "x86_64-linux";  # x86_64-linux, aarch64-multiplatform, etc.
-      stateVersion = "23.11";     # See https://nixos.org/manual/nixpkgs/stable for most recent
+      stateVersion = "24.11";     # See https://nixos.org/manual/nixpkgs/stable for most recent
 
       pkgs = import nixpkgs {
         inherit system;
