@@ -2,6 +2,7 @@
 
 let
   nixTools = with pkgs; [
+    ack
     cachix
     lorri
     spotify
@@ -19,5 +20,7 @@ let
     qucs-s
     teams-for-linux
     vscode
+    zoxide
+    fzf
   ];
 in nixTools
