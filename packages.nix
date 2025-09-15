@@ -8,7 +8,6 @@ let
     spotify
     nixfmt-classic
     keepassxc
-    google-chrome
     discord
     obsidian
     flatbuffers
@@ -16,9 +15,7 @@ let
     slack
     marp-cli
     htop
-    element-desktop
     qucs-s
-    teams-for-linux
     vscode
     zoxide
     fzf

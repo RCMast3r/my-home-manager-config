@@ -2,24 +2,18 @@
   description = "Home Manager configuration";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/release-24.11";
-    home-manager = {
-      url = "github:nix-community/home-manager/release-24.11";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    nixvim = {
-      url = "github:nix-community/nixvim/nixos-24.11";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.home-manager.follows = "home-manager";
-    };
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    home-manager.url = "github:nix-community/home-manager";
+    home-manager.inputs.nixpkgs.follows = "nixpkgs";
+    flake-parts.url = "github:hercules-ci/flake-parts";
   };
 
-  outputs = { self, nixpkgs, home-manager, nixvim, ... }:
+  outputs = { self, nixpkgs, home-manager, ... }:
     let
       # Values you should modify
       username = "ben"; # $USER
       system = "x86_64-linux";  # x86_64-linux, aarch64-multiplatform, etc.
-      stateVersion = "24.11";     # See https://nixos.org/manual/nixpkgs/stable for most recent
+      stateVersion = "25.05";     # See https://nixos.org/manual/nixpkgs/stable for most recent
 
       pkgs = import nixpkgs {
         inherit system;
@@ -43,7 +37,6 @@
         };
         modules = [
           home
-          nixvim.homeManagerModules.nixvim
         ];
       };
     };

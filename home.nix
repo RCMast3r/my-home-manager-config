@@ -27,5 +27,4 @@ in {
   };
 
   programs = import ./programs.nix { inherit pkgs; };
-  # services = import ./services.nix { inherit pkgs; };
 }
