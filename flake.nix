@@ -6,9 +6,11 @@
     home-manager.url = "github:nix-community/home-manager";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
     flake-parts.url = "github:hercules-ci/flake-parts";
+    nix-hm.url = "github:RCMast3r/nix-hm";
+    nix-hm.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { self, nixpkgs, home-manager, ... }:
+  outputs = { self, nixpkgs, home-manager, nix-hm, ... }:
     let
       # Values you should modify
       username = "ben"; # $USER
@@ -37,6 +39,12 @@
         };
         modules = [
           home
+          nix-hm.homeModules.vscode-settings
+          (
+            { config, ... }: {
+              config.vscode-settings.enable = true;
+            }
+          )
         ];
       };
     };

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-nix build '.#homeConfigurations.ben.activationPackage'
+nix build '.#homeConfigurations.ben.activationPackage' --override-input nix-hm ../nix-hm
 ./result/activate
 
 # Define source and target folder pairs
