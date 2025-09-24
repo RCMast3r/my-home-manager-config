@@ -40,9 +40,11 @@
         modules = [
           home
           nix-hm.homeModules.vscode-settings
+          nix-hm.homeModules.default-system-utils
           (
             { config, ... }: {
               config.vscode-settings.enable = true;
+              config.default-system-utils.enable = true;
             }
           )
         ];
