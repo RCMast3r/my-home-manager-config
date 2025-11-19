@@ -32,7 +32,6 @@
       });
     in {
       homeConfigurations.${username} = home-manager.lib.homeManagerConfiguration {
-        # lib = nixpkgs.lib;
         inherit pkgs;
         extraSpecialArgs = {
           inherit self;
