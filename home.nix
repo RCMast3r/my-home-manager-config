@@ -2,16 +2,16 @@
 , pkgs
 , stateVersion
 , system
-, username }:
+, username
+}:
 
 let
-  packages = import ./packages.nix { inherit pkgs; };
+  nixTools = import ./packages.nix { inherit pkgs; };
 in {
   home = {
-    inherit homeDirectory packages stateVersion username;
-    
-    
-    
+    inherit homeDirectory stateVersion username;
+    packages = nixTools;
+
     shellAliases = {
       reload-home-manager-config = "home-manager switch --flake ${builtins.toString ./.}";
     };
@@ -25,6 +25,4 @@ in {
       experimental-features = "nix-command flakes";
     };
   };
-
-  programs = import ./programs.nix { inherit pkgs; };
 }

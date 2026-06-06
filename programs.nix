@@ -1,7 +1,7 @@
-{ pkgs, ... }:
-let
-in {
-  home-manager = { enable = true; };
+{ pkgs, config, ... }:
+{
+  config.vscode-settings.enable = true;
+  # VSCode extensions and settings
   # vscode = {
   #   enable = true;
 
@@ -72,8 +72,7 @@ in {
   #     }
   #     {
   #       key = "ctrl+shift+tab";
-  #       command = "-workbench.action.quickOpenLeastRecentlyUsedEditorInGroup";
-  #       when = "!activeEditorGroupEmpty";
+  #       command = "workbench.action.quickOpenLeastRecentlyUsedEditorInGroup";
   #     }
   #     {
   #       key = "ctrl+shift+tab";
@@ -94,6 +93,7 @@ in {
   #   ];
   # };
 
+  # zsh configuration
   zsh = {
     enable = true;
     oh-my-zsh.enable = true;
@@ -119,10 +119,8 @@ in {
       "git-flow"
       "git-flow-avh"
       "github"
-      "git-hubflow"
       "gitignore"
       "git-lfs"
-      "git-prompt"
       "globalias"
       "gnu-utils"
       "isodate"
@@ -170,11 +168,11 @@ in {
       "zsh-navigation-tools"
     ];
   };
-  
+
+  # git configuration
   git = {
     enable = true;
     userEmail = "rcmast3r1@gmail.com";
     userName = "Ben Hall";
   };
-
 }
