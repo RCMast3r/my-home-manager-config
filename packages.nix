@@ -11,7 +11,6 @@ let
     discord
     obsidian
     flatbuffers
-    protobuf
     slack
     marp-cli
     htop
@@ -28,5 +27,7 @@ let
     pkgs.dejavu_fonts
     # Emoji and Unicode support - nerd font with emoji
     pkgs.nerd-fonts.dejavu-sans-mono
+    pkgs.terminator
+    pkgs.clang-tools
   ];
 in nixTools
