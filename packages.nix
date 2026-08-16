@@ -5,7 +5,7 @@ let
     ack
     cachix
     lorri
-    spotify
+    # spotify
     nixfmt-classic
     keepassxc
     discord
@@ -15,7 +15,6 @@ let
     marp-cli
     htop
     qucs-s
-    vscode
     zoxide
     fzf
     rustup
@@ -29,5 +28,6 @@ let
     pkgs.nerd-fonts.dejavu-sans-mono
     pkgs.terminator
     pkgs.clang-tools
+    pkgs.attic-client
   ];
 in nixTools
