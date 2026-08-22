@@ -1,30 +1,39 @@
 { pkgs }:
 
+# The union of what both machines used to install separately - one list, every
+# host. VS Code is deliberately absent: it comes from programs.vscode, wrapped
+# in vscode.nix.
 let
   nixTools = with pkgs; [
+    ack
+    attic-client
+    btop
     cachix
-    lorri
-    # spotify
-    nixpkgs-fmt
-    keepassxc
-    google-chrome
-    discord
-    freetube
-    obsidian
-    flatbuffers
-    protobuf
-    # whatsapp-for-linux
-    slack
-    marp-cli
-    htop
-    element-desktop
-    teams-for-linux
-    dotnetCorePackages.sdk_6_0_1xx # required for vscode because vscode is stupid and dumb
-    streamlink-twitch-gui-bin
     clang-tools
-    # jupyter
-    # python311Packages.black
-    # python311Packages.pip
-    lua
+    discord
+    flatbuffers
+    foxglove-studio
+    fzf
+    htop
+    keepassxc
+    llama-cpp
+    lorri
+    marp-cli
+    nixd
+    nixfmt
+    obsidian
+    protobuf
+    qucs-s
+    rustup
+    slack
+    spotify
+    terminator
+    zoxide
+
+    # Fonts for btop (braille patterns, geometric shapes, box drawing)
+    terminus_font
+    dejavu_fonts
+    # Emoji and Unicode support - nerd font with emoji
+    nerd-fonts.dejavu-sans-mono
   ];
 in nixTools

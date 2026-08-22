@@ -1,48 +1,226 @@
-#!/bin/bash
+#!/usr/bin/env bash
+# Apply this repo's configuration to whichever machine it is run on.
+#
+#   ./update.sh                   activate the configuration as it is on disk
+#   ./update.sh --update-inputs   bump flake.lock first, then activate
+#   ./update.sh --host laptop     force a host, ignoring auto-detection
+#
+# The repo holds one configuration per machine (hosts/<name>.nix, exposed as
+# homeConfigurations.<name>). This script works out which one applies here, in
+# this order:
+#
+#   1. --host <name>
+#   2. $HM_HOST
+#   3. the .host file beside this script  (gitignored, per-machine)
+#   4. the system hostname, if it contains a known host name
+#      ("nebs-desktop" -> desktop)
+#   5. an interactive prompt, whose answer is written to .host
+#
+# So a fresh clone on a machine whose hostname says what it is needs no setup
+# at all, and one that doesn't gets asked exactly once.
 
-nix build '.#homeConfigurations.ben.activationPackage'
-./result/activate
+set -euo pipefail
 
-# Define source and target folder pairs
-declare -A folder_pairs=(
-    [${HOME}/.nix-profile/share/applications]="${HOME}/.local/share/applications"
-    [${HOME}/.nix-profile/share/icons]="${HOME}/.local/share/icons"
-    # Add more pairs as needed
-)
+# Operate on the flake beside this script, whatever the caller's cwd is.
+cd "$(dirname "$(readlink -f "$0")")"
 
-echo "${folder_pairs}"
-# Loop through folder pairs
-for source_folder in "${!folder_pairs[@]}"; do
-echo "$source_folder"
-    target_folder="${folder_pairs[${source_folder}]}"
-    
-    # Check if source folder exists
-    if [ ! -d "$source_folder" ]; then
-        echo "Source folder '$source_folder' does not exist."
-        continue
+HOST_FILE=".host"
+
+# Available hosts come from the filesystem rather than a list kept in step with
+# flake.nix by hand.
+mapfile -t HOSTS < <(find hosts -maxdepth 1 -name '*.nix' -printf '%f\n' | sed 's/\.nix$//' | sort)
+if [ "${#HOSTS[@]}" -eq 0 ]; then
+    echo "no host configurations found in hosts/" >&2
+    exit 1
+fi
+
+usage() {
+    cat >&2 <<EOF
+usage: $0 [--update-inputs] [--host <name>]
+
+known hosts: ${HOSTS[*]}
+EOF
+}
+
+host=""
+update_inputs=0
+while [ $# -gt 0 ]; do
+    case "$1" in
+        --update-inputs) update_inputs=1 ;;
+        --host) host="${2:-}"; shift ;;
+        --host=*) host="${1#--host=}" ;;
+        -h|--help) usage; exit 0 ;;
+        *) echo "unknown argument: $1" >&2; usage; exit 64 ;;
+    esac
+    shift
+done
+
+known_host() {
+    local candidate="$1" h
+    for h in "${HOSTS[@]}"; do
+        [ "$h" = "$candidate" ] && return 0
+    done
+    return 1
+}
+
+# 2. environment override, 3. the per-machine file
+[ -n "$host" ] || host="${HM_HOST:-}"
+host_source="the --host argument or \$HM_HOST"
+if [ -z "$host" ] && [ -r "$HOST_FILE" ]; then
+    host="$(head -1 "$HOST_FILE" | tr -d '[:space:]')"
+    host_source="$HOST_FILE"
+fi
+
+# Whatever named it, it has to be a host we actually have a file for - catch
+# that here rather than letting nix fail on a missing flake attribute.
+if [ -n "$host" ] && ! known_host "$host"; then
+    echo "$host_source names '$host', which is not one of: ${HOSTS[*]}" >&2
+    exit 1
+fi
+
+# 4. hostname. Matched as a substring so "nebs-desktop.lan" finds "desktop".
+if [ -z "$host" ]; then
+    this_hostname="$(hostname -s 2>/dev/null || hostname)"
+    this_hostname="${this_hostname,,}"
+    for h in "${HOSTS[@]}"; do
+        case "$this_hostname" in
+            *"$h"*) host="$h"; break ;;
+        esac
+    done
+    [ -n "$host" ] && echo "==> Detected host '$host' from hostname '$this_hostname'"
+fi
+
+# 5. ask, once, and remember the answer
+if [ -z "$host" ]; then
+    if [ ! -t 0 ]; then
+        echo "Could not tell which machine this is, and stdin is not a terminal." >&2
+        echo "Re-run with --host <name>, or write one of these to $HOST_FILE: ${HOSTS[*]}" >&2
+        exit 1
     fi
-    
-    # Check if target folder exists, if not, create it
-    if [ ! -d "$target_folder" ]; then
-        mkdir -p "$target_folder"
-    fi
-    
-    # Loop through files in the source folder
-    for file in "$source_folder"/*; do
-        # Extract the filename from the full path
-        filename=$(basename "$file")
-        
-        # Check if a symlink with the same filename already exists in the target folder
-        if [ ! -e "$target_folder/$filename" ]; then
-            # Create a symlink in the target folder
-            ln -s "$file" "$target_folder/$filename"
-            echo "Created symlink for '$filename' in '$target_folder'."
-        else
-            echo "Symlink for '$filename' already exists in '$target_folder'. deleting and remaking."
-            rm "$target_folder/$filename"
-            ln -s "$file" "$target_folder/$filename"
+    echo "Could not tell which machine this is from the hostname."
+    select choice in "${HOSTS[@]}"; do
+        if [ -n "${choice:-}" ]; then
+            host="$choice"
+            break
         fi
     done
-    
-    echo "Symlink creation process for '$source_folder' completed."
-done
+    [ -n "$host" ] || exit 1
+    printf '%s\n' "$host" > "$HOST_FILE"
+    echo "==> Wrote '$host' to $HOST_FILE (gitignored); future runs will skip this prompt."
+fi
+
+echo "==> Host: $host"
+
+# This is a working repo that gets rebuilt from a dirty tree constantly, so the
+# "Git tree ... is dirty" warning is noise rather than news.
+NIX_FLAGS=(--no-warn-dirty)
+HM_ATTR=".#homeConfigurations.${host}"
+
+if [ "$update_inputs" -eq 1 ]; then
+    echo "==> Updating flake inputs"
+    nix flake update
+fi
+
+# Re-pin nvidia-driver-pin.nix to whatever NVIDIA driver is currently loaded, so
+# targets.genericLinux.gpu.nvidia (see hosts/desktop.nix) always builds a
+# userspace driver matching the host - mismatched versions between the kernel
+# module and userspace libs segfault instead of rendering. Machines with no
+# NVIDIA module loaded never consult the pin, so this is skipped there rather
+# than branched on the host name.
+nvidia_version=$(grep -oP '[0-9]+\.[0-9]+\.[0-9]+' /proc/driver/nvidia/version 2>/dev/null | head -1 || true)
+if [ -n "$nvidia_version" ]; then
+    pinned_version=$(sed -n 's/.*version = "\(.*\)".*/\1/p' nvidia-driver-pin.nix)
+    if [ "$nvidia_version" != "$pinned_version" ]; then
+        echo "==> NVIDIA driver changed ($pinned_version -> $nvidia_version), re-pinning nvidia-driver-pin.nix"
+        url="https://download.nvidia.com/XFree86/Linux-x86_64/${nvidia_version}/NVIDIA-Linux-x86_64-${nvidia_version}.run"
+        sha256=$(nix store prefetch-file --json --hash-type sha256 "$url" | jq -r .hash)
+        cat > nvidia-driver-pin.nix <<EOF
+# Auto-generated by update.sh from the host's loaded NVIDIA driver
+# (/proc/driver/nvidia/version). Do not hand-edit; re-run update.sh instead.
+{
+  version = "${nvidia_version}";
+  sha256 = "${sha256}";
+}
+EOF
+        git add nvidia-driver-pin.nix
+    fi
+else
+    echo "==> No NVIDIA driver loaded, leaving nvidia-driver-pin.nix alone."
+fi
+
+# Build before activating anything, so an evaluation error fails the run
+# outright instead of leaving the machine half-updated.
+echo "==> Building home-manager generation"
+nix build "${HM_ATTR}.activationPackage" --out-link result "${NIX_FLAGS[@]}"
+
+# Sync /run/opengl-driver before activating: home-manager's activation warns
+# about a missing/stale link, and running the setup first means it never has
+# anything to warn about. The setup script installs an /etc/tmpfiles.d entry
+# (gcrooted) that recreates the symlink at boot, so root is only needed when
+# the store paths actually change - hence the readlink guards, which keep this
+# from prompting for sudo on every run.
+echo "==> Checking GPU driver links"
+gpu_drivers=$(nix build "${HM_ATTR}.config.targets.genericLinux.gpu.drivers" --no-link --print-out-paths "${NIX_FLAGS[@]}")
+gpu_setup=$(nix build "${HM_ATTR}.config.targets.genericLinux.gpu.setupPackage" --no-link --print-out-paths "${NIX_FLAGS[@]}")
+if [ "$(readlink /run/opengl-driver || true)" != "$gpu_drivers" ] \
+    || [ "$(readlink /etc/tmpfiles.d/non-nixos-gpu.conf || true)" != "${gpu_setup}/lib/tmpfiles.d/non-nixos-gpu.conf" ]; then
+    echo "==> Syncing /run/opengl-driver (requires root)"
+    sudo "${gpu_setup}/bin/non-nixos-gpu-setup"
+else
+    echo "    already current"
+fi
+
+# Move aside, rather than fail on, any hand-written dotfile home-manager now
+# wants to own (~/.gitconfig on a machine that never ran programs.git, say).
+export HOME_MANAGER_BACKUP_EXT="hm-backup"
+
+echo "==> Activating home-manager generation"
+./result/activate
+
+# targets.genericLinux puts ~/.nix-profile/share on XDG_DATA_DIRS, so GNOME can
+# read desktop entries and icons straight out of the profile and nothing needs
+# mirroring into ~/.local/share. That only takes effect at session start,
+# though, so until this shell can see it, keep mirroring by hand - otherwise
+# every launcher would vanish from the app grid until the next login.
+if [[ ":${XDG_DATA_DIRS:-}:" == *":${HOME}/.nix-profile/share:"* ]]; then
+    # Sweep up the leftovers of the mirroring this script used to do: that loop
+    # only ever created links, so every package dropped from packages.nix left
+    # a dead launcher behind.
+    #
+    # Deliberately narrow: only symlinks, only ones resolving into the Nix
+    # profile. Real files and links to anything else (RPM, Flatpak, hand-made)
+    # are untouched.
+    echo "==> Removing leftover desktop/icon symlinks into the Nix profile"
+    removed=0
+    for dir in "${HOME}/.local/share/applications" "${HOME}/.local/share/icons"; do
+        [ -d "$dir" ] || continue
+        while IFS= read -r link; do
+            echo "    $(basename "$link")"
+            rm -f "$link"
+            removed=$((removed + 1))
+        done < <(find "$dir" -maxdepth 1 -type l -lname '*nix-profile*')
+    done
+    if [ "$removed" -eq 0 ]; then
+        echo "    none left to remove"
+    fi
+else
+    echo "==> Mirroring profile launchers into ~/.local/share"
+    for share in applications icons; do
+        source_folder="${HOME}/.nix-profile/share/${share}"
+        target_folder="${HOME}/.local/share/${share}"
+        [ -d "$source_folder" ] || continue
+        mkdir -p "$target_folder"
+        for file in "$source_folder"/*; do
+            [ -e "$file" ] || continue
+            filename=$(basename "$file")
+            rm -f "${target_folder:?}/${filename}"
+            ln -s "$file" "${target_folder}/${filename}"
+        done
+    done
+    echo
+    echo "Note: XDG_DATA_DIRS does not yet include the Nix profile on this"
+    echo "session. Log out and back in, then re-run this script - it will drop"
+    echo "the mirrored launchers above and let GNOME read the profile directly."
+fi
+
+echo "==> Done."
