@@ -12,7 +12,6 @@ let
     clang-tools
     discord
     flatbuffers
-    foxglove-studio
     fzf
     htop
     keepassxc
